@@ -1,0 +1,91 @@
+Description of the Global Model of influenza transmission
+by Eben Kenah and Dennis Chao
+
+1. Introduction
+
+The Global Model can be used to model the transmission of a new strain 
+of influenza around the globe.  
+
+2. Requirements
+
+The model is written in Python and requires the numpy library 
+(http://numpy.scipy.org) to be installed.
+
+3. Quick start
+
+The source file "global_model8.py" contains all of the model code.
+The default settings assume that there is a directory "DataFiles"
+that contains information about the cities in the model, the
+influenza season of these cities, and the passenger travel volume
+among these cities.  We recommend using the defaults: 
+population_321_age.txt, seasonality_321.csv, and travel_321.txt.
+
+To run the model in Python, create a globalModel object.  For
+example, to initialize a global model with normal seasonality and an
+maximum R0 of 1.5:
+  > import global_model as globalmodel
+  > Erth = globalmodel.season_globalModel(name='R0 = 1.5', R0=1.5, lowR0=0.8, popFile = 'DataFiles/population_321_age.txt',travelFile = 'DataFiles/travel_321.txt', sympTratio=0.25, exchangeArrayList=True, randomSeed=1)
+
+To run the model, use the global_epidemic method.  To start an epidemic
+in Mexico City with 100 infected individuals on January 1, using the
+model initialized as above:
+  > Erth.global_epidemic(starttime=1, imprtList=[("Mexico_City", 100)])
+The model can take about 15-20 minutes to run.
+
+After the model is done, the results are stored in the globalModel
+object.  you can output the results to text files using the 
+write_global method of the global_csv object, which is defined in the 
+global_csv.py file.  If you call:
+  > global_csv.write_global(Erth, "out")
+you will get the following output files:
+    out-args.csv, which summarizes the parameters for the model run.
+    out-r.csv, which outputs the number of susceptible people each day in
+    	       each city.
+    out-i.csv, which outputs the number of infected people each day in
+    	       each city.
+    out-r.csv, which outputs the number of recovered people each day in
+    	       each city.
+    out-r4.csv, which outputs the number of recovered people each day in
+    	       each city by subpopulation and risk group.
+    out-exchange.csv, which outputs the number of infected people who 
+    	       travel between each pair of cities each day.  This file
+	       can only be output when the globalModel object has its
+ 	       exchangeArrayList member variable set to True.
+
+4. Class list
+
+epiList - Influenza transmission model for a single city.
+
+globalModel - Base class for all global models.  Creates and manages
+an array of epiLists.
+
+step_globalModel - The influenza season of all cities north of the 
+Tropic of Cancer is from October 1 to March 31, all cities south of
+the Tropic of Capricorn is from April 1 to September 30, and all
+cities between the two tropics is always in-season.  Transmissibility
+is high in-season and low out-of-season.
+
+linear_globalModel - same as step_globalModel except that there is
+a 30-day transition when transmissibility changes at the beginning
+and at the end of influenza season in the temperate areas.
+
+season_globalModel - uses a seasonality data file to determine the
+transmissibility of influenza for each city and each day of the year.
+
+prevac_globalModel - same as season_global_model, but prevaccinates
+a fraction of the population.
+
+vacfile_globalModel - same as season_global_model, but vaccinates 
+individuals based on the contents of an input file, which specifies
+the timing and the fraction of the population of each city to vaccinate
+
+5. License
+
+This software is released under the GPLv3. See gpl.txt.
+
+6. Version history
+
+October 2010: Version 1.0
+This version was used to produce the results in the manuscript
+"The global transmission and control of influenza".
+
